@@ -1,0 +1,146 @@
+$white: #FFF;
+$black: #000;
+$text: var(--text);
+$main: var(--main);
+$mainBg: var(--mainBg);
+
+@function printRGB($opacity) {
+  @return rgba(#{'var(--rgbmain)'}, $opacity)
+};
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {width: 7px;}
+::-webkit-scrollbar-track {box-shadow: inset 0 0 6px rgba($black, 0.3);background-color: rgb(255 255 255 / 40%);}
+::-webkit-scrollbar-thumb {background-color: $main;}
+
+aside > div {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.sider-light li.ant-menu-item {color: $text}
+.sider-light li.ant-menu-item:not(.ant-menu-item-selected):hover {color: $text !important;}
+.sider-light li.ant-menu-item-selected {color: $main}
+
+.trigger {
+  margin-top: auto;
+  margin-bottom: 5px;
+  font-size: 18px;
+  padding: 10px;
+  opacity: .6;
+  transition: opacity .3s ease-in-out;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:hover {opacity: 1;}
+}
+
+.pcunit-space .ant-space-item {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  svg {height: inherit;padding: 6px  0 4px;}
+  span {font-size: 18px;font-weight: bold;}
+}
+
+.light-unit { // use in old design
+  background: rgba($white, .25) !important;
+  box-shadow: 0 8px 15px 0 rgba($black, .37) !important;/// DONE
+  backdrop-filter: blur(7px) !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba($white, 0.3 ) !important;
+}
+
+.ant-drawer-content.dark-drawer {
+  background: $mainBg !important;
+  color: $white !important;
+  .ant-drawer-header {border-bottom: 1px solid rgba($white, .2) !important;}
+  .ant-drawer-title {
+    color: $white !important;
+    text-shadow: 2px 3px 8px $white !important;
+  }
+}
+
+.market {
+  .ant-table-wrapper {
+    margin-top: 30px;
+    background: transparent !important;
+    .ant-table {
+      background-color: $mainBg !important;
+      color: $text !important;
+      thead th {background-color: $main !important;color: $white !important;}
+    }
+    .ant-table-tbody>tr>td {padding: 5px !important;}
+    .ant-table-tbody >tr.ant-table-row:hover>td,
+    .ant-table-tbody >tr.ant-table-row-selected >td {background-color: printRGB(.4) !important;}
+  
+    ul {
+      justify-content: center !important;
+      li a {color: $text !important}
+      .ant-pagination-prev button,
+      .ant-pagination-next button {color: rgba($text, .88) !important;}
+      .ant-pagination-disabled button {color: rgba($text, .2) !important;}
+      .ant-pagination-item-active a {color: $main !important;}
+    }
+  }
+}
+
+// Setting
+.setting-page {
+  // TODO fix dark & light mode conflict
+  .setting-item {
+    color: $white;
+    background: #607D8B;
+    border-radius: 6px;
+    padding: 6.5px 10px 6.5px 15px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    span {margin-right: 15px;}
+    svg {cursor: pointer;font-size: 18px;}
+  }
+  
+  .ant-input-number-input-wrap {width: 78px;background-color: $white;}
+  .ant-input-number-group-addon {
+    background-color: $main;
+    color: $white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 0;
+  }
+}
+
+
+.ant-select-selector {background: transparent !important;border-width: 0 0 1px !important;border-bottom-color: $text !important;}
+.ant-select-focused .ant-select-selector {box-shadow: none !important;}
+.ant-select-selection-item {color: $text !important;}
+.ant-select-arrow {color: $text !important}
+.ant-select-item:hover {background: printRGB(.6) !important;color: $text !important;}
+.ant-select-item-option-selected {background: $main !important;color: $text !important;}
+
+
+/// Test
+.site-input-group-wrapper .site-input-split {
+  background-color: $white !important;
+}
+
+.site-input-group-wrapper .site-input-right {
+  border-left-width: 0;
+}
+
+.site-input-group-wrapper .site-input-right:hover,
+.site-input-group-wrapper .site-input-right:focus {
+  border-left-width: 1px;
+}
+
+.site-input-group-wrapper .ant-input-rtl.site-input-right {
+  border-right-width: 0;
+}
