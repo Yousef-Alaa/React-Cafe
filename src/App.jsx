@@ -10,7 +10,7 @@ export const AppContext = createContext(null)
 
 function App() {
 
-    let isDark = false; // TODO get from local storage
+    let isDark = false; // TODO get from local storage n
     let bgLinear = false; // TODO get from local storage
     let getColorsMap = useCallback((themeIsDark, bgIsLinear) => {
         return {
