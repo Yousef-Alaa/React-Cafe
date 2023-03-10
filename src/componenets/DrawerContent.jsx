@@ -47,16 +47,6 @@ function DContent({ unitState, dispatch, unitType }) {
         return Number( cost.slice(0, i + 3) );
     }
 
-
-    /* TODO:
-    === change icons
-    === change status color & text
-    === add select instead of radios
-    === buttons job
-    ===
-    ===
-    */
-
     return (
         <Layout style={{background: 'transparent'}}>
             <Row style={rowsStyle}>
@@ -110,7 +100,6 @@ function DContent({ unitState, dispatch, unitType }) {
                     <Col style={colsStyle} span={24 - iconSize}>
                         <Select 
                         size='small'
-                        // dropdownStyle={{background: 'transparent'}}
                         options={[
                             {value: 'single', label: 'Single Player'},
                             {value: 'multi', label: 'Multi Player'}
@@ -158,7 +147,7 @@ function DContent({ unitState, dispatch, unitType }) {
                     */
                     unitState.status === 0 ? <Button onClick={() => dispatch({type: 'UNIT_START'})} type="primary">Start</Button> :
                     unitState.status === 1 ? <><Button onClick={() => dispatch({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button style={{marginRight: 15}} type="primary">Order</Button><Button onClick={() => dispatch({type: 'UNIT_END'})} style={{background: 'transparent'}} danger>End</Button></> :
-                    unitState.status === 2 ? <><Button onClick={() => dispatch({type: 'UNIT_PAUSED'})} style={{marginRight: 15}} type="primary">Stop</Button><Button style={{marginRight: 15}} type="primary">Order</Button><Button onClick={() => dispatch({type: 'UNIT_END'})} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
+                    unitState.status === 2 ? <><Button onClick={() => dispatch({type: 'UNIT_PAUSED'})} style={{marginRight: 15, background: '#ffcf4b'}}>Stop</Button><Button style={{marginRight: 15}} type="primary">Order</Button><Button onClick={() => dispatch({type: 'UNIT_END'})} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
                 }
             </Row>
         </Layout>

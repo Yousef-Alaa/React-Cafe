@@ -12,7 +12,6 @@ function PagesHead({ pageTitle }) {
 
     return (
         <Row justify='space-between' align='center' style={{marginBlock: '5px 15px'}}>
-            {/* TODO: Fix Color */}
             <Col style={{display: 'flex', alignItems: 'center'}}><Title style={{color: colors.text, margin: 0}}>{pageTitle}</Title></Col>
             <Col style={{display: 'flex', alignItems: 'center'}}><img width='150' style={{filter: `drop-shadow(2px 4px 5px ${colors.text})`}} src={Shapes} alt='Controls' /></Col>
         </Row>

@@ -3,16 +3,13 @@ import {
     DoubleRightOutlined,
     DoubleLeftOutlined,
     HomeOutlined,
-    TeamOutlined,
-    LaptopOutlined,
+    BarChartOutlined,
     ShopOutlined,
-    SettingOutlined,
-    HighlightOutlined
+    SettingOutlined
 } from '@ant-design/icons';
-import { Layout, Menu } from 'antd';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactComponent as PlayStation} from '../assets/PlayStation.svg';
 import { ReactComponent as PlayStationSmall} from '../assets/PlayStation-Small.svg';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../App';
 
 function SideBar() {
@@ -25,62 +22,56 @@ function SideBar() {
         {
             key: '/',
             icon: <HomeOutlined />,
-            label: "Home",
+            label: "Home"
         },
         {
             key: '/market',
             icon: <ShopOutlined />,
-            label: "Market",
+            label: "Market"
+        },
+        {
+            key: '/reports',
+            icon: <BarChartOutlined />,
+            label: "Reports"
         },
         {
             key: '/settings',
             icon: <SettingOutlined />,
-            label: "Settings",
-        },
-        {
-            key: '/reports',
-            icon: <LaptopOutlined />,
-            label: "Reports",
-        },
-        {
-            key: '/users', // TODO remove it
-            icon: <TeamOutlined />,
-            label: "Users",
-        },
-        {
-            key: '/olddesign',// TODO remove it
-            icon: <HighlightOutlined />,
-            label: "Old Design",
-        },
-        {
-        key: '/images',// TODO remove it
-        icon: <SettingOutlined />,
-        label: "Images",
-        },
+            label: "Settings"
+        }
+        // {
+        //     key: '/getapp',
+        //     icon: <DownloadOutlined />,
+        //     label: "Get App"
+        // }
     ];
 
-
     return (
-    <Layout.Sider className={!isDark && 'sider-light'} trigger={null} style={{background: 'transparent', backdropFilter: `blur(${isDark ? 0 : 3}px)`, paddingTop: 10}} collapsible collapsed={collapsed}>
+    <aside data-aside style={{backdropFilter: `blur(${isDark ? 0 : 3}px)`, paddingTop: 10, width: collapsed ? 80 : 185, minWidth: collapsed ? 80 : 185}}>
         <div className="logo">
             {collapsed ?
-                <PlayStationSmall style={{maxWidth: '100%', fill: colors.text, height: 60, filter: `drop-shadow(2px 4px 5px ${colors.textWithOpacity(70)})`}} /> :
-                <PlayStation style={{maxWidth: '100%', fill: colors.text, height: 60, filter: `drop-shadow(2px 4px 5px ${colors.textWithOpacity(70)})`}} />
+                <PlayStationSmall style={{maxWidth: '100%', fill: colors.text, height: 60, marginBottom: 8, filter: `drop-shadow(2px 4px 5px ${colors.textWithOpacity(70)})`}} /> :
+                <PlayStation style={{maxWidth: '100%', fill: colors.text, height: 60, marginBottom: 8, filter: `drop-shadow(2px 4px 5px ${colors.textWithOpacity(70)})`}} />
             }
         </div>
-        <Menu
-        theme={isDark ? "dark" : 'light'}
-        style={{background: 'transparent'}}
-        mode="inline"
-        onSelect={({key}) => navigate(key)}
-        defaultSelectedKeys={[location.pathname]}
-        items={NavItems}
-        />
+        <ul style={{'--fontSize': collapsed ? 16 : 14}}>
+            {NavItems.map((item, index) => <li 
+            key={index} 
+            style={{padding: collapsed ? '0 28px' : '0 16px 0 24px'}}
+            onClick={() => navigate(item.key)}
+            className={`nav-item ${item.key === location.pathname ? 'nav-item-active' : ''}`}
+            >
+
+                {item.icon}
+                <span>{item.label}</span>
+
+            </li>)}
+        </ul>
 
         <span className='trigger' style={{color: colors.text}} onClick={() => setCollapsed(!collapsed)}>
             {collapsed ? <DoubleRightOutlined /> : (<><DoubleLeftOutlined /><span>&nbsp;&nbsp;Shrink</span></>)}
         </span>
-    </Layout.Sider>
+    </aside>
     );
 }
 

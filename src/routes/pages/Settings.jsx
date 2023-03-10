@@ -4,7 +4,7 @@ import Icon, { FieldTimeOutlined, HighlightOutlined } from '@ant-design/icons'
 import { AppContext } from "../../App";
 import PagesHead from '../../componenets/PagesHead';
 import { RiComputerLine } from 'react-icons/ri';
-import { MdLocalPolice, MdOutlineEdit } from 'react-icons/md';
+import { MdOutlineEdit } from 'react-icons/md';
 import { GiConfirmed } from 'react-icons/gi';
 import { SwatchesPicker } from 'react-color';
 import { ReactComponent as PS4Controller } from '../../assets/icons/ps4-controller.svg'

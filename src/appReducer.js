@@ -55,6 +55,27 @@ export default function appReducer(state, action) {
                     multiPrice: action.data.multiPrice
                 }
             }
+        case 'MARKET_ADD_ITEM':
+            return {
+                ...state,
+                market: [...state.market, action.payload]
+            }
+        case 'MARKET_EDIT_ITEM':
+            return {
+                ...state,
+                market: state.market.map(item => item.uid === action.payload.uid ? action.payload : item)
+            }
+        case 'MARKET_DELETE_ITEM':
+            return {
+                ...state,
+                market: state.market.filter(item => item.uid !== action.uid)
+            }
+        case 'MARKET_DELETE_ITEMS':
+            return {
+                ...state,
+                market: state.market.filter(item => !action.uids.includes(item.uid))
+            }
+
         default: 
             return state;
     }

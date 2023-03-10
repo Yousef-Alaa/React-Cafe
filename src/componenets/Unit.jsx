@@ -13,7 +13,6 @@ import { useEffect } from 'react';
 
 export default function Unit({index, unitType}) {
 
-    // let pricesList = Units_DB.unitsPrices[unitType]
     let { appSettings } = useContext(AppContext)
 
     const initialValues = {

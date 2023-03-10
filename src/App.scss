@@ -4,8 +4,16 @@ $text: var(--text);
 $main: var(--main);
 $mainBg: var(--mainBg);
 
-@function printRGB($opacity) {
-  @return rgba(#{'var(--rgbmain)'}, $opacity)
+@function printRGB($color, $opacity) {
+
+  @if ($color == 'main') {
+    @return rgba(#{'var(--rgbmain)'}, $opacity)
+  };
+  
+  @if ($color == 'text') {
+    @return rgba(#{'var(--rgbtext)'}, $opacity)
+  };
+
 };
 
 * {
@@ -27,20 +35,6 @@ aside > div {
 .sider-light li.ant-menu-item {color: $text}
 .sider-light li.ant-menu-item:not(.ant-menu-item-selected):hover {color: $text !important;}
 .sider-light li.ant-menu-item-selected {color: $main}
-
-.trigger {
-  margin-top: auto;
-  margin-bottom: 5px;
-  font-size: 18px;
-  padding: 10px;
-  opacity: .6;
-  transition: opacity .3s ease-in-out;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  &:hover {opacity: 1;}
-}
 
 .pcunit-space .ant-space-item {
   height: 30px;
@@ -72,6 +66,8 @@ aside > div {
   .ant-table-wrapper {
     margin-top: 30px;
     background: transparent !important;
+    th, td {text-align: center !important;}
+    td.ant-table-column-sort {background-color: printRGB('main', .4) !important;}
     .ant-table {
       background-color: $mainBg !important;
       color: $text !important;
@@ -79,14 +75,15 @@ aside > div {
     }
     .ant-table-tbody>tr>td {padding: 5px !important;}
     .ant-table-tbody >tr.ant-table-row:hover>td,
-    .ant-table-tbody >tr.ant-table-row-selected >td {background-color: printRGB(.4) !important;}
+    .ant-table-tbody >tr.ant-table-row-selected >td {background-color: printRGB('main', .4) !important;}
   
     ul {
       justify-content: center !important;
       li a {color: $text !important}
-      .ant-pagination-prev button,
-      .ant-pagination-next button {color: rgba($text, .88) !important;}
-      .ant-pagination-disabled button {color: rgba($text, .2) !important;}
+      .ant-pagination-prev button svg,
+      .ant-pagination-next button svg {fill: $text !important;opacity: .88;}
+      .ant-pagination-disabled button svg {fill: $text !important;opacity: .2;}
+      .ant-pagination-item-active {background: transparent;}
       .ant-pagination-item-active a {color: $main !important;}
     }
   }
@@ -94,7 +91,6 @@ aside > div {
 
 // Setting
 .setting-page {
-  // TODO fix dark & light mode conflict
   .setting-item {
     color: $white;
     background: #607D8B;
@@ -123,9 +119,66 @@ aside > div {
 .ant-select-focused .ant-select-selector {box-shadow: none !important;}
 .ant-select-selection-item {color: $text !important;}
 .ant-select-arrow {color: $text !important}
-.ant-select-item:hover {background: printRGB(.6) !important;color: $text !important;}
+.ant-select-item:hover {background: printRGB('main', .6) !important;color: $text !important;}
 .ant-select-item-option-selected {background: $main !important;color: $text !important;}
 
+
+[data-aside] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: .3s ease;
+  .logo svg {fill: $text;transition: .3s ease;}
+  ul {
+    list-style: none;
+    width: 100%;
+    transition: .3s ease;
+    li {
+      color: printRGB('text', .65);
+      margin: 4px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: color .3s ease, background .3s ease;
+      span:nth-of-type(1) {transition: 0s ease;font-size: var(--fontSize);}
+      span:nth-of-type(2) {
+        overflow: hidden;
+        padding-left: 10px;
+        flex: auto;
+        white-space: nowrap;
+      }
+      svg {fill: printRGB('text', .65);}
+      &:hover {
+        background: rgba($black, .08);
+        // background: printRGB('text', .06);
+        color: $text;
+        svg {fill: $text;}
+      }
+      &.nav-item-active,
+      &.nav-item-active:hover {
+        background: $main;
+        color: $white;
+        svg {fill: $white;}
+      }
+    }
+  }
+  .trigger {
+    margin-top: auto;
+    margin-bottom: 5px;
+    font-size: 18px;
+    padding: 10px;
+    opacity: .6;
+    transition: opacity .3s ease-in-out;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    &:hover {opacity: 1;}
+  }
+}
 
 /// Test
 .site-input-group-wrapper .site-input-split {
@@ -143,4 +196,31 @@ aside > div {
 
 .site-input-group-wrapper .ant-input-rtl.site-input-right {
   border-right-width: 0;
+}
+
+.market-modal {
+  .ant-modal-content {
+    background: printRGB('main', .35) !important;
+    backdrop-filter: blur(10px);
+    color: $white;}
+  .ant-modal-header {background: transparent;}
+  .ant-modal-title {color: $white;}
+  button.ant-modal-close {color: $white;}
+  button.ant-modal-close:hover {color: rgba($white, .7); background-color: transparent;}
+  input {
+    background: rgba($white, .4) !important;
+    border: none !important;
+    color: $white !important;
+    &::placeholder {
+      color: rgba($white, .5) !important;
+    }
+    &:disabled {
+      background: #455a64 !important;
+      user-select: none;
+    }
+  }
+  .ant-input-number {
+    background-color: transparent;
+    border: none;
+  }
 }

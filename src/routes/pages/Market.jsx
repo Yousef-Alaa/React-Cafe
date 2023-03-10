@@ -1,46 +1,37 @@
-import React, { useState } from 'react';
-import { Button, Table } from 'antd';
-import {
-    DollarCircleOutlined, FieldTimeOutlined
-} from '@ant-design/icons'
-// import { AppContext } from "../../App";
+import React, { useEffect, useState } from 'react';
+import { Button, Table, message, Input, InputNumber, Popconfirm, Modal, Row, Col } from 'antd';
+import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
+import { MdOutlineEdit } from 'react-icons/md';
+import { AppContext } from "../../App";
 import PagesHead from '../../componenets/PagesHead';
-import PSSmall from '../../assets/PlayStation-Small.svg'
+import { useContext } from 'react';
+import NewMarketItem from '../../componenets/NewMarketItem';
+import EditMarketItem from '../../componenets/EditMarketItem';
 
 const columns = [
-    { title: '#ID', dataIndex: 'id' },
-    { title: 'Icon', dataIndex: 'icon' },
+    { title: '#ID', dataIndex: 'uid'},
+    { title: 'Icon', dataIndex: 'iconAsImg' },
     { title: 'Name', dataIndex: 'name' },
-    { title: 'Price', dataIndex: 'price' },
-    { title: 'Count', dataIndex: 'count' },
-    { title: 'Edit', dataIndex: 'edit' },
-    { title: 'Delete', dataIndex: 'delete' },
+    { title: 'Price', dataIndex: 'price', sorter: (a, b) => a.price - b.price},
+    { title: 'Stowage', dataIndex: 'stowage', sorter: (a, b) => a.stowage - b.stowage},
+    { title: 'Actions', dataIndex: 'actions' }
 ];
-
-const data = [];
-for (let i = 1; i < 46; i++) {
-    data.push({
-        key: i,
-        id: `#${i < 10 ? '0' + i : i}`,
-        icon: <img src={PSSmall} width='40' height='40' alt='icon' />,
-        name: `Item ${i}`,
-        price: i * 11,
-        count: i * 7,
-        edit: <DollarCircleOutlined />, // TODO Will open page or window to edit
-        delete: <FieldTimeOutlined />,
-    });
-}
 
 
 export default function Market() {
 
-    // const { appSettings: {theme: { colors, isDark }} } = React.useContext(AppContext)
-
+    const { appSettings: { market }, dispatchSetting } = useContext(AppContext)
+    
+    const [localMarket, setLocalMarket] = useState([{key: 1, icon: '', name: ``, price: 0, stowage: 0}])
+    const [itemId, setItemId] = useState('000000')
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isNewModalOpen, setIsNewModalOpen] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const onSelectChange = (newSelectedRowKeys) => {
-        console.log('selectedRowKeys changed: ', newSelectedRowKeys);
+
+    function onSelectChange(newSelectedRowKeys) {
         setSelectedRowKeys(newSelectedRowKeys);
     };
+
     const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
@@ -79,14 +70,58 @@ export default function Market() {
     ],
     };
 
+    useEffect(() => {
+        let d = market.map((item, ind) => {
+            let i = ind + 1;
+            return {
+            ...item, 
+            key: i,
+            iconAsImg: <img src={item.icon.local ? `/images/marketicons/${item.icon.src}` : item.icon.src} width='40' height='40' alt='icon' />,
+            actions: <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                columnGap: '20px'
+            }}>
+                <MdOutlineEdit onClick={() => {setIsEditModalOpen(true); setItemId(item.uid)}} style={{cursor: 'pointer', fontSize: 18}} />
+                <Popconfirm
+                placement="topRight"
+                title='Confirm Deleting'
+                description={`Are you sure to delete Item ?`}
+                onConfirm={() => {
+                    dispatchSetting({type: 'MARKET_DELETE_ITEM', uid: item.uid})
+                    setItemId('000000')
+                    message.success('Deleted Successfuly')
+                }}
+                okText="Yes"
+                cancelText="No"
+                icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
+                    <DeleteOutlined style={{cursor: 'pointer', fontSize: 18, color: '#ff4d4f'}} />
+                </Popconfirm>
+            </div>
+        }})
+
+        setLocalMarket(d)
+    }, [market])
+
+    function handleDeleteItems() {
+        let items = localMarket.filter(item => selectedRowKeys.includes(item.key)).map(item => item.uid)
+        dispatchSetting({type: 'MARKET_DELETE_ITEMS', uids: items})
+        setSelectedRowKeys([])
+        setItemId('000000')
+        message.success('Deleted Successfuly')
+    }
+
     return (
     <div className='market'>
         <PagesHead pageTitle='Market' />
-        {/* TODO: Filter & selection in price & count columns */}
-        <Table rowSelection={rowSelection} columns={columns} dataSource={data} />
+        <Table rowSelection={rowSelection} columns={columns} dataSource={localMarket} />
         <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: 20, paddingBottom: 40}}>
-            <Button type='primary' style={{marginRight: 12}}>Add New Item</Button> {/* TODO: Will open page or window to edit */}
-            <Button type='primary' danger>Remove Selected Items</Button> {/* TODO: Will open page or window to edit */}
+            <Button type='primary' onClick={() => setIsNewModalOpen(true)} style={{marginRight: 12}}>Add New Item</Button>
+            <Button type='primary' onClick={handleDeleteItems} danger>Remove Selected Items</Button>
         </div>
+        
+        <EditMarketItem isEditModalOpen={isEditModalOpen} setIsEditModalOpen={setIsEditModalOpen} itemId={itemId} setItemId={setItemId} />
+        <NewMarketItem isNewModalOpen={isNewModalOpen} setIsNewModalOpen={setIsNewModalOpen} />
     </div>)
 }
