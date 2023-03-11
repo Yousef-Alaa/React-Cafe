@@ -1,17 +1,18 @@
 import React, { useContext } from 'react';
-import { Col, Row, Button, Select, Layout } from 'antd';
-import {
-    DollarCircleOutlined, FieldTimeOutlined, HourglassOutlined, ShoppingCartOutlined
-} from '@ant-design/icons'
+import { Col, Row, Button, Select, Layout, Modal } from 'antd';
+import { DollarCircleOutlined, FieldTimeOutlined, HourglassOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { FaRegLightbulb } from 'react-icons/fa';
 import { MdMode } from 'react-icons/md';
 import { AppContext } from '../App';
+import { useState } from 'react';
 
-function DContent({ unitState, dispatch, unitType }) {
+
+function DrawerContent({ unitState, dispatch, unitType }) {
     
     let iconSize = 2
-    const { appSettings } = useContext(AppContext)
+    const { appSettings, dispatchSetting } = useContext(AppContext)
     let {theme: { colors }} = appSettings
+    const [isOpen, setIsOpen] = useState(false)
     let rowsStyle = {
         marginBottom: 7
     }
@@ -140,19 +141,65 @@ function DContent({ unitState, dispatch, unitType }) {
             </Row>
             <Row style={{marginTop: 20}}>
                 {
-                    /*  TODO:
-                        1. Add order Func
-                        2. Complete end func
-                        3. Colors of buttons
-                    */
                     unitState.status === 0 ? <Button onClick={() => dispatch({type: 'UNIT_START'})} type="primary">Start</Button> :
-                    unitState.status === 1 ? <><Button onClick={() => dispatch({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button style={{marginRight: 15}} type="primary">Order</Button><Button onClick={() => dispatch({type: 'UNIT_END'})} style={{background: 'transparent'}} danger>End</Button></> :
-                    unitState.status === 2 ? <><Button onClick={() => dispatch({type: 'UNIT_PAUSED'})} style={{marginRight: 15, background: '#ffcf4b'}}>Stop</Button><Button style={{marginRight: 15}} type="primary">Order</Button><Button onClick={() => dispatch({type: 'UNIT_END'})} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
+                    unitState.status === 1 ? <><Button onClick={() => dispatch({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button onClick={() => {dispatch({type: 'UNIT_END'}); dispatchSetting({type: 'UNIT_END', payload: unitState.orders})}} style={{background: 'transparent'}} danger>End</Button></> :
+                    unitState.status === 2 ? <><Button onClick={() => dispatch({type: 'UNIT_PAUSED'})} style={{marginRight: 15}}>Stop</Button><Button type="primary" onClick={() => setIsOpen(true)} style={{marginRight: 15}}>Order</Button><Button onClick={() => {dispatch({type: 'UNIT_END'}); dispatchSetting({type: 'UNIT_END', payload: unitState.orders})}} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
                 }
             </Row>
+            <MarketItems unitState={unitState} dispatch={dispatch} ordersTotal={getOrdersTotal()} isOpen={isOpen} setIsOpen={setIsOpen} />
         </Layout>
     );
 }
 
+function MarketItems({ unitState, dispatch, ordersTotal, isOpen, setIsOpen }) {
 
-export default DContent;
+    function handleClick(uid) {
+
+        let myItem = unitState.orders.find(item => item.uid === uid);
+        myItem.count++;
+        dispatch({type: 'ADD_ORDER', payload: myItem})
+
+    }
+
+    return (
+        <Modal
+            title='Choose From Market Items'
+            className='market-modal custom-modal-footer'
+            open={isOpen} onOk={() => setIsOpen(false)}
+            onCancel={() => setIsOpen(false)}
+            footer={[
+                <span key="total" style={{fontSize: 16, fontWeight: 'bold'}}>Orders Total: {ordersTotal}$</span>,
+                <Button key='ok' type='primary' onClick={() => setIsOpen(false)}>Ok</Button>
+            ]}
+            >
+            <div className='menu-items'>
+                {
+                    unitState.orders.map((item, i) => <div key={i} onClick={() => handleClick(item.uid)}>
+                        <img src={item.icon.local ? `/images/marketicons/${item.icon.src}` : item.icon.src} width={50} height={50} alt={`market item ${i + 1}`} />
+                        <span className='name'>{item.name}</span>
+                        <span className='price'>{item.price}$</span>
+                    </div>)
+                }
+            </div>
+        </Modal>
+    )
+}
+
+function UnitEnd({isOpen, setIsOpen}) {
+    return (
+        <Modal
+            title='End Time'
+            className='market-modal'
+            open={isOpen} onOk={() => setIsOpen(false)}
+            onCancel={() => setIsOpen(false)}
+            footer={[
+                <Button key='ok' type='primary' onClick={() => setIsOpen(false)}>Ok</Button>
+            ]}
+            >
+                Some Content
+        </Modal>
+    )
+}
+
+
+export default DrawerContent;

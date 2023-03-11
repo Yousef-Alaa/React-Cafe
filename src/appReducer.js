@@ -75,6 +75,19 @@ export default function appReducer(state, action) {
                 ...state,
                 market: state.market.filter(item => !action.uids.includes(item.uid))
             }
+        case 'UNIT_END':
+
+            let orders = action.payload.map(item => {
+                let stowage = item.stowage - item.count;
+                let theNew = { ...item, stowage }
+                delete theNew.count;
+                return theNew
+            })
+
+            return {
+                ...state,
+                market: orders
+            }
 
         default: 
             return state;

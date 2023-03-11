@@ -50,7 +50,7 @@ export default function reducer(state, action) {
                 durationWork: false,
                 duration: 0,
                 startTime: '00:00',
-                orders: []
+                orders: state.orders.map(item => ({...item, count: 0}))
             }
         }
         case 'UNIT_PLAY_TIME': {
@@ -69,6 +69,11 @@ export default function reducer(state, action) {
                 hourPrice: action.newPrice
             }
         }
+        case 'ADD_ORDER':
+            return {
+                ...state,
+                orders: state.orders.map(item => item.uid === action.payload.uid ? action.payload : item)
+            }
         default: 
             return state;
     }

@@ -6,7 +6,7 @@ import unitReducer from './unitReducer.js';
 import { ReactComponent as PCSVG} from '../assets/PC.svg';
 import { ReactComponent as PS4} from '../assets/console-with-gamepad.svg';
 import { ReactComponent as PS5} from '../assets/playstation-5.svg';
-import DContent from './DrawerContent.jsx';
+import DrawerContent from './DrawerContent.jsx';
 import { useEffect } from 'react';
 
 
@@ -14,7 +14,7 @@ import { useEffect } from 'react';
 export default function Unit({index, unitType}) {
 
     let { appSettings } = useContext(AppContext)
-
+    let orders = appSettings.market.map(item => ({...item, count: 0}))
     const initialValues = {
         unitType,
         status: 0,// 0 = Not start yet, 1 = paused, 2 = Running...
@@ -23,10 +23,7 @@ export default function Unit({index, unitType}) {
         durationWork: false,
         startTime: '00:00',
         mode: unitType === 'pc' ? 'pc' : 'single',// [single & Multi] for PS; [pc] for pc 
-        orders: [
-            {name: 'Can', price: 10, count: 3},
-            {name: 'Indomy', price: 7, count: 2}
-        ]
+        orders
     }
     
     const [open, setOpen] = useState(false);
@@ -96,7 +93,7 @@ export default function Unit({index, unitType}) {
             open={open}
             key={`${unitType}-${index}`}
         >
-            <DContent unitState={unitState} unitType={unitType} dispatch={dispatch} />
+            <DrawerContent unitState={unitState} unitType={unitType} dispatch={dispatch} />
         </Drawer>
     </>
     )

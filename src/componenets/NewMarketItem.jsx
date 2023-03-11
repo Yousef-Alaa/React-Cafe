@@ -23,7 +23,6 @@ function NewMarketItem({ isNewModalOpen, setIsNewModalOpen }) {
             icon: {local: !isCustom, src: isCustom ? iconURL : localIcon}
         }
 
-        console.log(newItem);
         dispatchSetting({type: 'MARKET_ADD_ITEM', payload: newItem})
         setIsNewModalOpen(false);
         setName('')
