@@ -1,12 +1,15 @@
 import { Modal, Row, Col, InputNumber, Input } from 'antd'
-import { useEffect } from 'react';
-import { useState, useContext } from 'react';
-import { AppContext } from '../App';
+import { useEffect, useState } from 'react';
+import { editItem } from '../redux/marketSlice'
+import { useDispatch, useSelector } from 'react-redux';
 
 function EditMarketItem({isEditModalOpen, setIsEditModalOpen, itemId, setItemId}) {
 
-    const { appSettings: { market }, dispatchSetting } = useContext(AppContext)
+    const dispatch = useDispatch()
+    const market = useSelector(state => state.market)
+
     const myItem = itemId === '000000' ? {name: '', stowage: 0, price: 0} : market.filter(item => item.uid === itemId)[0]
+    
     const [name, setName] = useState(myItem.name)
     const [stowage, setStowage] = useState(myItem.stowage)
     const [price, setPrice] = useState(myItem.price)
@@ -20,7 +23,7 @@ function EditMarketItem({isEditModalOpen, setIsEditModalOpen, itemId, setItemId}
             icon: myItem.icon
         }
 
-        dispatchSetting({type: 'MARKET_EDIT_ITEM', payload: item})
+        dispatch(editItem(item))
         setItemId('000000')
     };
 

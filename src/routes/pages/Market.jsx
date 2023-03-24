@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Table, message, Input, InputNumber, Popconfirm, Modal, Row, Col } from 'antd';
+import { Button, Table, message, Popconfirm } from 'antd';
 import { DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons'
 import { MdOutlineEdit } from 'react-icons/md';
-import { AppContext } from "../../App";
 import PagesHead from '../../componenets/PagesHead';
-import { useContext } from 'react';
 import NewMarketItem from '../../componenets/NewMarketItem';
 import EditMarketItem from '../../componenets/EditMarketItem';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteItem, deleteItems } from '../../redux/marketSlice'
 
 const columns = [
     { title: '#ID', dataIndex: 'uid'},
@@ -20,7 +20,8 @@ const columns = [
 
 export default function Market() {
 
-    const { appSettings: { market }, dispatchSetting } = useContext(AppContext)
+    const dispatch = useDispatch()
+    const market = useSelector(state => state.market)
     
     const [localMarket, setLocalMarket] = useState([{key: 1, icon: '', name: ``, price: 0, stowage: 0}])
     const [itemId, setItemId] = useState('000000')
@@ -89,7 +90,7 @@ export default function Market() {
                 title='Confirm Deleting'
                 description={`Are you sure to delete Item ?`}
                 onConfirm={() => {
-                    dispatchSetting({type: 'MARKET_DELETE_ITEM', uid: item.uid})
+                    dispatch(deleteItem(item.uid))
                     setItemId('000000')
                     message.success('Deleted Successfuly')
                 }}
@@ -106,7 +107,7 @@ export default function Market() {
 
     function handleDeleteItems() {
         let items = localMarket.filter(item => selectedRowKeys.includes(item.key)).map(item => item.uid)
-        dispatchSetting({type: 'MARKET_DELETE_ITEMS', uids: items})
+        dispatch(deleteItems(items))
         setSelectedRowKeys([])
         setItemId('000000')
         message.success('Deleted Successfuly')

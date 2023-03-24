@@ -18,7 +18,7 @@ export default function reducer(state, action) {
     switch (action.type) {
         case 'UNIT_START': {
             let date = new Date();
-            let hours = date.getHours() // Todo: Able to make 12 hour system
+            let hours = date.getHours()
             let hoursBy12 = hours > 12 ? hours - 12 : hours ;
             let minutes = date.getMinutes()
             let startTime = `${hoursBy12 < 10 ? '0' + hoursBy12 : hoursBy12}:${minutes < 10 ? '0' + minutes : minutes}`;

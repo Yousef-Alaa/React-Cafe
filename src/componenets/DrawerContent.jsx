@@ -1,25 +1,27 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Col, Row, Button, Select, Layout, Modal } from 'antd';
 import { DollarCircleOutlined, FieldTimeOutlined, HourglassOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { FaRegLightbulb } from 'react-icons/fa';
 import { MdMode } from 'react-icons/md';
-import { AppContext } from '../App';
+import { ReactComponent as PCSVG} from '../assets/PC.svg';
+import { ReactComponent as PS4} from '../assets/console-with-gamepad.svg';
+import { ReactComponent as PS5} from '../assets/playstation-5.svg';
 import { useState } from 'react';
+import { setOrdersOnEndUint } from '../redux/marketSlice'
+import { useDispatch, useSelector } from 'react-redux';
 
 
-function DrawerContent({ unitState, dispatch, unitType }) {
+function DrawerContent({ unitState, unitDispatcher, unitType, unitName, setOpen }) {
     
-    let iconSize = 2
-    const { appSettings, dispatchSetting } = useContext(AppContext)
-    let {theme: { colors }} = appSettings
+    const colors = useSelector(state => state.theme.colors);
+    const unitsSettings = useSelector(state => state.units);
+    
     const [isOpen, setIsOpen] = useState(false)
-    let rowsStyle = {
-        marginBottom: 7
-    }
-    let colsStyle = {
-        fontSize: 16,
-        fontWeight: 'bold'
-    }
+    const [isEndOpen, setIsEndOpen] = useState(false)
+    
+    const iconSize = 2
+    const rowsStyle = {marginBottom: 7}
+    const colsStyle = {fontSize: 16, fontWeight: 'bold'}
 
     function getOrdersTotal() {
         let { orders } = unitState;
@@ -40,10 +42,6 @@ function DrawerContent({ unitState, dispatch, unitType }) {
     function getTimeCost() {
         let timeByHour = (unitState.duration / 60) / 60;
         let cost = `${timeByHour * unitState.hourPrice}`;
-        /* let local = ((unitState.duration / 60) / 60).toLocaleString("ar-EG", {
-            style: 'currency',
-            currency: 'EGP'
-        }); */
         let i = cost.indexOf('.')
         return Number( cost.slice(0, i + 3) );
     }
@@ -78,11 +76,6 @@ function DrawerContent({ unitState, dispatch, unitType }) {
                             unitState.status === 1 ? 'Paused' :
                             unitState.status === 2 ? 'Running...' : 'Unknown Status'
                         }</span>
-                    {/* <Space direction="vertical">
-                        <Badge status="success" style={{color: '#52c41a'}} text="Running..." />
-                        {/* <Badge status="warning" text="Paused" />
-                        <Badge status="error" text="Not Work" /> *}
-                    </Space> */}
                 </Col>
             </Row>
             <Row style={rowsStyle}>
@@ -106,10 +99,10 @@ function DrawerContent({ unitState, dispatch, unitType }) {
                             {value: 'multi', label: 'Multi Player'}
                         ]} 
                         value={unitState.mode} 
-                        onChange={value => dispatch({
+                        onChange={value => unitDispatcher({
                             value,
                             type: 'CHANGE_UNIT_MODE',
-                            newPrice: value === 'single' ? appSettings[unitType].singlePrice : appSettings[unitType].multiPrice 
+                            newPrice: value === 'single' ? unitsSettings[unitType].singlePrice : unitsSettings[unitType].multiPrice 
                             })} />
                     </Col>
             </Row>
@@ -141,23 +134,24 @@ function DrawerContent({ unitState, dispatch, unitType }) {
             </Row>
             <Row style={{marginTop: 20}}>
                 {
-                    unitState.status === 0 ? <Button onClick={() => dispatch({type: 'UNIT_START'})} type="primary">Start</Button> :
-                    unitState.status === 1 ? <><Button onClick={() => dispatch({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button onClick={() => {dispatch({type: 'UNIT_END'}); dispatchSetting({type: 'UNIT_END', payload: unitState.orders})}} style={{background: 'transparent'}} danger>End</Button></> :
-                    unitState.status === 2 ? <><Button onClick={() => dispatch({type: 'UNIT_PAUSED'})} style={{marginRight: 15}}>Stop</Button><Button type="primary" onClick={() => setIsOpen(true)} style={{marginRight: 15}}>Order</Button><Button onClick={() => {dispatch({type: 'UNIT_END'}); dispatchSetting({type: 'UNIT_END', payload: unitState.orders})}} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
+                    unitState.status === 0 ? <Button onClick={() => unitDispatcher({type: 'UNIT_START'})} type="primary">Start</Button> :
+                    unitState.status === 1 ? <><Button onClick={() => unitDispatcher({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button onClick={() => setIsEndOpen(true)} style={{background: 'transparent'}} danger>End</Button></> :
+                    unitState.status === 2 ? <><Button onClick={() => unitDispatcher({type: 'UNIT_PAUSED'})} style={{marginRight: 15}}>Stop</Button><Button type="primary" onClick={() => setIsOpen(true)} style={{marginRight: 15}}>Order</Button><Button onClick={() => setIsEndOpen(true)} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
                 }
             </Row>
-            <MarketItems unitState={unitState} dispatch={dispatch} ordersTotal={getOrdersTotal()} isOpen={isOpen} setIsOpen={setIsOpen} />
+            <MarketItems unitState={unitState} unitDispatcher={unitDispatcher} ordersTotal={getOrdersTotal()} isOpen={isOpen} setIsOpen={setIsOpen} />
+            <UnitEnd unitState={unitState} unitType={unitType} unitDispatcher={unitDispatcher} ordersTotal={getOrdersTotal()} timeCost={getTimeCost()} setParentOpen={setOpen} isEndOpen={isEndOpen} setIsEndOpen={setIsEndOpen} unitName={unitName} />
         </Layout>
     );
 }
 
-function MarketItems({ unitState, dispatch, ordersTotal, isOpen, setIsOpen }) {
+function MarketItems({ unitState, unitDispatcher, ordersTotal, isOpen, setIsOpen }) {
 
     function handleClick(uid) {
 
         let myItem = unitState.orders.find(item => item.uid === uid);
         myItem.count++;
-        dispatch({type: 'ADD_ORDER', payload: myItem})
+        unitDispatcher({type: 'ADD_ORDER', payload: myItem})
 
     }
 
@@ -185,21 +179,80 @@ function MarketItems({ unitState, dispatch, ordersTotal, isOpen, setIsOpen }) {
     )
 }
 
-function UnitEnd({isOpen, setIsOpen}) {
+function UnitEnd({isEndOpen, unitState, setParentOpen, setIsEndOpen, unitDispatcher, unitName, ordersTotal, timeCost, unitType}) {
+
+    const dispatch = useDispatch()
+    const colors = useSelector(state => state.theme.colors) 
+
+    let title = unitName.split('');
+    title.splice(unitName.indexOf('Drawer'), 7)
+    let finalTitle = title.join("").slice(0, title.indexOf(' ') + 1) + '> #' + title.join("").slice(title.indexOf(' ') + 1)
+    
+    const iconSize = 1
+    const rowsStyle = {marginBottom: 3}
+    const colsStyle = {fontSize: 16, fontWeight: 'bold'}
+    const unitImgStyle = {
+        fill: colors.textWithOpacity(90),
+        filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, .8))',
+        height: 65,
+        position: 'relative',
+        padding: unitType === 'ps4' ? '6px 6px 0' : ''
+    }
+
+    function handleClick() {
+        setIsEndOpen(false)
+        unitDispatcher({type: 'UNIT_END'})
+        dispatch(setOrdersOnEndUint(unitState.orders))
+        setParentOpen(false)
+        //Todo add Report
+    }
+
     return (
         <Modal
             title='End Time'
-            className='market-modal'
-            open={isOpen} onOk={() => setIsOpen(false)}
-            onCancel={() => setIsOpen(false)}
+            className='market-modal endtime-modal'
+            open={isEndOpen} onOk={() => setIsEndOpen(false)}
+            onCancel={() => setIsEndOpen(false)}
             footer={[
-                <Button key='ok' type='primary' onClick={() => setIsOpen(false)}>Ok</Button>
+                <Button key='ok' type='primary' onClick={handleClick}>End Now</Button>,
+                <Button key='back' onClick={() => setIsEndOpen(false)}>Cancel</Button>
             ]}
             >
-                Some Content
+                <div className='head'>
+                    <h3>{finalTitle}</h3>
+                    {
+                        unitType === 'pc' ? <PCSVG style={unitImgStyle} />
+                        : unitType === 'ps4' ? <PS4 style={unitImgStyle} />
+                        : unitType === 'ps5' ? <PS5 style={unitImgStyle} /> : null
+                        
+                    }
+                </div>
+                <Row style={{...rowsStyle, marginTop: 12, color: '#faad14'}}>
+                    <Col style={colsStyle} xs={2} span={iconSize}>
+                        <ShoppingCartOutlined />
+                    </Col>
+                    <Col style={colsStyle} xs={22} span={24 - iconSize}>
+                        Orders: {ordersTotal}$
+                    </Col>
+                </Row>
+                <Row style={{...rowsStyle, color: '#2980b9'}}>
+                    <Col style={colsStyle} xs={2} span={iconSize}>
+                        <FieldTimeOutlined />
+                    </Col>
+                    <Col style={colsStyle} xs={22} span={24 - iconSize}>
+                        Time Cost: {timeCost}$
+                    </Col>
+                </Row>
+                <Row style={{...rowsStyle, color: '#17BBB0'}}>
+                    <Col style={colsStyle} xs={2} span={iconSize}>
+                        <DollarCircleOutlined />
+                    </Col>
+                    <Col style={colsStyle} xs={22} span={24 - iconSize}>
+                        Total Cost: {ordersTotal + timeCost}$
+                    </Col>
+                </Row>
         </Modal>
     )
 }
-
 
 export default DrawerContent;

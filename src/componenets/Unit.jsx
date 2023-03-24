@@ -1,24 +1,27 @@
-import React, { useContext, useState, useReducer } from 'react';
+import React, { useState, useReducer } from 'react';
 import { Drawer } from 'antd';
 import UnitsDataConfig from './UnitsConfig.js';
-import { AppContext } from '../App';
 import unitReducer from './unitReducer.js';
 import { ReactComponent as PCSVG} from '../assets/PC.svg';
 import { ReactComponent as PS4} from '../assets/console-with-gamepad.svg';
 import { ReactComponent as PS5} from '../assets/playstation-5.svg';
 import DrawerContent from './DrawerContent.jsx';
 import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 
 
 export default function Unit({index, unitType}) {
 
-    let { appSettings } = useContext(AppContext)
-    let orders = appSettings.market.map(item => ({...item, count: 0}))
+    const market = useSelector(state => state.market)
+    const unitsSettings = useSelector(state => state.units)
+    const { colors, isDark } = useSelector(state => state.theme)
+
+    const orders = market.map(item => ({...item, count: 0}))
     const initialValues = {
         unitType,
         status: 0,// 0 = Not start yet, 1 = paused, 2 = Running...
-        hourPrice: unitType === 'pc' ? appSettings.pc.hourPrice : appSettings[unitType].singlePrice,
+        hourPrice: unitType === 'pc' ? unitsSettings.pc.hourPrice : unitsSettings[unitType].singlePrice,
         duration: 0,
         durationWork: false,
         startTime: '00:00',
@@ -28,8 +31,7 @@ export default function Unit({index, unitType}) {
     
     const [open, setOpen] = useState(false);
     const { unitIndexStyle } = UnitsDataConfig[unitType];
-    const { appSettings: {theme : { colors, isDark }} } = useContext(AppContext)
-    let [unitState, dispatch] = useReducer(unitReducer, initialValues)
+    const [unitState, unitDispatcher] = useReducer(unitReducer, initialValues)
     const unitImgStyle = {
         fill: colors.textWithOpacity(isDark ? 75 : 90),
         filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, .8))',
@@ -51,7 +53,7 @@ export default function Unit({index, unitType}) {
         if (unitState.durationWork) {
 
             durationInterval = setInterval(() => {
-                dispatch({type: 'INCREMENT_TIME'})
+                unitDispatcher({type: 'INCREMENT_TIME'})
             }, 1000)
         }
 
@@ -88,12 +90,12 @@ export default function Unit({index, unitType}) {
             className={isDark && 'dark-drawer'}
             title={`${unitType.toUpperCase()} Drawer ${index < 9 ? `0${index + 1}` : index + 1}`}
             placement='right'
-            closable={false}
+            closable={true}
             onClose={() => setOpen(false)}
             open={open}
             key={`${unitType}-${index}`}
         >
-            <DrawerContent unitState={unitState} unitType={unitType} dispatch={dispatch} />
+            <DrawerContent setOpen={setOpen} unitName={`${unitType.toUpperCase()} Drawer ${index < 9 ? `0${index + 1}` : index + 1}`} unitState={unitState} unitType={unitType} unitDispatcher={unitDispatcher} />
         </Drawer>
     </>
     )

@@ -1,10 +1,12 @@
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { getUID } from '../App';
+import { addItem } from '../redux/marketSlice'
 import { Modal, Row, Col, InputNumber, Input, Select, Switch } from 'antd'
-import { useState, useContext } from 'react';
-import { AppContext, getUID } from '../App';
 
 function NewMarketItem({ isNewModalOpen, setIsNewModalOpen }) {
 
-    const { dispatchSetting } = useContext(AppContext)
+    const dispatch = useDispatch()
     const [name, setName] = useState('')
     const [localIcon, setLocalIcon] = useState('nescafe.png')
     const [stowage, setStowage] = useState(0)
@@ -14,7 +16,6 @@ function NewMarketItem({ isNewModalOpen, setIsNewModalOpen }) {
 
     function handleOk() {
         
-
         let newItem = {
             uid: getUID(),
             price,
@@ -23,7 +24,7 @@ function NewMarketItem({ isNewModalOpen, setIsNewModalOpen }) {
             icon: {local: !isCustom, src: isCustom ? iconURL : localIcon}
         }
 
-        dispatchSetting({type: 'MARKET_ADD_ITEM', payload: newItem})
+        dispatch(addItem(newItem))
         setIsNewModalOpen(false);
         setName('')
         setLocalIcon('nescafe.png')

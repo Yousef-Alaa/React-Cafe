@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Layout, Switch, Row, Typography, Col, Select, InputNumber, Button } from 'antd';
-import Icon, { FieldTimeOutlined, HighlightOutlined } from '@ant-design/icons'
-import { AppContext } from "../../App";
+import { Layout, Switch, Typography, Col, InputNumber, Button } from 'antd';
+import Icon, { HighlightOutlined } from '@ant-design/icons'
 import PagesHead from '../../componenets/PagesHead';
 import { RiComputerLine } from 'react-icons/ri';
 import { MdOutlineEdit } from 'react-icons/md';
@@ -9,25 +8,33 @@ import { GiConfirmed } from 'react-icons/gi';
 import { SwatchesPicker } from 'react-color';
 import { ReactComponent as PS4Controller } from '../../assets/icons/ps4-controller.svg'
 import { ReactComponent as PS5Controller } from '../../assets/icons/ps5-controller.svg'
+import { useDispatch, useSelector } from 'react-redux';
+import { changePC, changePS4, changePS5 } from '../../redux/unitsSlice'
+import { changeTheme, changeBgLinear, changeColors } from '../../redux/themeSlice'
 
 let { Title } = Typography;
 
 export default function Settings() {
 
-    const { appSettings, dispatchSetting} = React.useContext(AppContext)
-    let {theme: {colors, isDark, bgLinear}} = appSettings
-    let [color, setColor] = useState({ hex: colors.main })
-    let [pickerOpen, setPickerOpen] = useState(false)
-    let [dark, setDark] = useState(isDark)
-    let [linear, setLinear] = useState(bgLinear)
+    const dispatch = useDispatch();
+    const unitsSettings = useSelector(state => state.units)
+    const {colors, isDark, bgLinear} = useSelector(state => state.theme)
 
-    let [localHoursSystem, setHoursSystem] = useState(appSettings.hoursSystem)
-    let [localPC, setLocalPC] = useState({...appSettings.pc, dEditing: false, hEditing: false})
-    let [localPS4, setLocalPS4] = useState({...appSettings.ps4, dEditing: false, sEditing: false, mEditing: false})
-    let [localPS5, setLocalPS5] = useState({...appSettings.ps5, dEditing: false, sEditing: false, mEditing: false})
+    const [color, setColor] = useState({ hex: colors.main })
+    const [pickerOpen, setPickerOpen] = useState(false)
+    const [dark, setDark] = useState(isDark)
+    const [linear, setLinear] = useState(bgLinear)
 
-    let rowsStyle = (isForm) => {
-        let style = {
+    const [localPC, setLocalPC] = useState({...unitsSettings.pc, dEditing: false, hEditing: false})
+    const [localPS4, setLocalPS4] = useState({...unitsSettings.ps4, dEditing: false, sEditing: false, mEditing: false})
+    const [localPS5, setLocalPS5] = useState({...unitsSettings.ps5, dEditing: false, sEditing: false, mEditing: false})
+
+    
+    const titleStyle = {color: colors.text, width: '100%', display: 'flex', alignItems: 'center', fontSize: 26 }
+    const colsStyle = {display: 'flex', alignItems: 'center', fontSize: 16, fontWeight: 'bold'}
+    const smallTitleStyle = {marginRight: 10}
+    const rowsStyle = (isForm) => {
+        const style = {
             padding: '10px 0',
             borderBottom: `1px solid ${colors.text}`,
             marginBottom: '12px'
@@ -39,15 +46,6 @@ export default function Settings() {
         }
         return style
     }
-    let titleStyle = {
-        color: colors.text,
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        fontSize: 26
-    }
-    let colsStyle = {display: 'flex', alignItems: 'center', fontSize: 16, fontWeight: 'bold'}
-    let smallTitleStyle = {marginRight: 10}
 
     function handleSubmitColor(e) {
         e.preventDefault()
@@ -59,13 +57,9 @@ export default function Settings() {
 
         if (color.rgb) data.rgbmain = `${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}`;
 
-
-        dispatchSetting({type: 'SET_THEME', data: dark})
-        dispatchSetting({type: 'SET_BGLINEAR', data: linear})
-        dispatchSetting({
-            type: 'CHANGE_COLORS',
-            data
-        })
+        dispatch(changeTheme(dark))
+        dispatch(changeBgLinear(linear))
+        dispatch(changeColors(data))
     }
 
     return (
@@ -116,7 +110,7 @@ export default function Settings() {
                     <Button style={{marginLeft: 'auto'}} type='primary' htmlType="submit">Apply</Button>
                 </Col>
             </form>
-            <form onSubmit={e => {e.preventDefault(); dispatchSetting({type: 'CHANGE_UNIT_PC', data: localPC})}} style={rowsStyle(true)}>
+            <form onSubmit={e => {e.preventDefault(); dispatch(changePC(localPC))}} style={rowsStyle(true)}>
                 <Title level={3} style={titleStyle}><RiComputerLine style={{marginRight: 7}} />PC</Title>
                 <Col span={12} style={{...colsStyle, paddingLeft: 37}}>
                     {localPC.dEditing ? 
@@ -159,7 +153,7 @@ export default function Settings() {
                     <Button style={{marginLeft: 'auto'}} type='primary' htmlType="submit">Apply</Button>
                 </Col>
             </form>
-            <form onSubmit={e => {e.preventDefault(); dispatchSetting({type: 'CHANGE_UNIT_PS4', data: localPS4})}} style={rowsStyle(true)}>
+            <form onSubmit={e => {e.preventDefault(); dispatch(changePS4(localPS4))}} style={rowsStyle(true)}>
                 <Title level={3} style={titleStyle}><Icon component={PS4Controller} style={{marginRight: 7}} />PS4</Title>
                 <Col span={8} style={{...colsStyle, paddingLeft: 37}}>
                 {localPS4.dEditing ? 
@@ -220,7 +214,7 @@ export default function Settings() {
                     <Button style={{marginLeft: 'auto'}} htmlType='submit' type="primary">Apply</Button>
                 </Col>
             </form>
-            <form onSubmit={e => {e.preventDefault(); dispatchSetting({type: 'CHANGE_UNIT_PS5', data: localPS5})}} style={rowsStyle(true)}>
+            <form onSubmit={e => {e.preventDefault(); dispatch(changePS5(localPS5))}} style={rowsStyle(true)}>
                 <Title level={3} style={titleStyle}><Icon component={PS5Controller} style={{marginRight: 7}} />PS5</Title>
                 <Col span={8} style={{...colsStyle, paddingLeft: 37}}>
                 {localPS5.dEditing ? 
@@ -279,24 +273,6 @@ export default function Settings() {
                         </div>
                     }
                     <Button style={{marginLeft: 'auto'}} htmlType='submit' type="primary">Apply</Button>
-                </Col>
-            </form>
-            <form onSubmit={e => {e.preventDefault(); dispatchSetting({type: 'CHANGE_UNIT_MODE', data: localHoursSystem})}} style={rowsStyle(true)}>
-                <Title level={3} style={titleStyle}><FieldTimeOutlined style={{marginRight: 7}} />Hours System (Beta)</Title>
-                <Col span={12} style={{...colsStyle, paddingLeft: 37}}>
-                    <span style={smallTitleStyle}>24 hour system</span>
-                </Col>
-                <Col span={12} style={{...colsStyle, justifyContent: 'flex-end'}}>
-                    <Select 
-                        size='small'
-                        options={[
-                            {value: 12, label: '12 Hour'},
-                            {value: 24, label: '24 Hour'}
-                        ]}
-                        value={localHoursSystem}
-                        onChange={value => setHoursSystem(value)} 
-                    />
-                    <Button style={{marginLeft: 10}} htmlType='submit' type="primary">Apply</Button>
                 </Col>
             </form>
         </Layout>

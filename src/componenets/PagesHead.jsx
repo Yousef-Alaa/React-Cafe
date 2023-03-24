@@ -1,14 +1,13 @@
 import React from 'react';
-import {  Typography, Row, Col } from 'antd';
-import { AppContext } from "../App";
-import { useContext } from 'react';
+import { Typography, Row, Col } from 'antd';
 import Shapes from '../assets/shapes.png';
+import { useSelector } from 'react-redux';
 
 let { Title } = Typography;
 
 function PagesHead({ pageTitle }) {
 
-    let { appSettings: {theme: { colors }} } = useContext(AppContext)
+    let colors = useSelector(state => state.theme.colors)
 
     return (
         <Row justify='space-between' align='center' style={{marginBlock: '5px 15px'}}>

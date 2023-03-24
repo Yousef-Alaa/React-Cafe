@@ -1,12 +1,11 @@
 import React from "react";
 import Unit from '../../componenets/Unit';
 import PagesHead from "../../componenets/PagesHead";
-import { AppContext } from '../../App';
-import { useContext } from "react";
+import { useSelector } from "react-redux";
 
 function Home() {
 
-    let { appSettings: {pc, ps4, ps5} } = useContext(AppContext);
+    const { pc, ps4, ps5 } = useSelector(state => state.units)
 
     const style = {
         paddingBottom: 15,
