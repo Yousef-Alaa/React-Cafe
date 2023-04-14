@@ -5,12 +5,16 @@ import {
     HomeOutlined,
     BarChartOutlined,
     ShopOutlined,
+    FullscreenOutlined,
+    FullscreenExitOutlined,
     SettingOutlined
 } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
+import { useMediaQuery } from 'react-responsive'
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ReactComponent as PlayStation} from '../assets/PlayStation.svg';
 import { ReactComponent as PlayStationSmall} from '../assets/PlayStation-Small.svg';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 function SideBar() {
 
@@ -19,6 +23,8 @@ function SideBar() {
     const { colors, isDark } = useSelector(state => state.theme)
 
     const [collapsed, setCollapsed] = useState(false);
+    const [fullScreen, setFullScreen] = useState(false);
+    const isSmallerThan544 = useMediaQuery({ query: '(max-width: 544px)' })
     const NavItems = [
         {
             key: '/',
@@ -54,9 +60,41 @@ function SideBar() {
         left: collapsed ? '-100%' : 0
     }
 
+    useEffect(() => {
+        document.addEventListener("fullscreenchange", (event) => {
+            if (window.innerHeight == screen.height) {
+                setFullScreen(true);
+            } else {
+                setFullScreen(false);
+            }
+        });
+    }, [])
+
+    function handleFullScreen() {
+        if (!fullScreen) {
+            // Open Fullscreen
+            if (document.body.requestFullscreen) {
+                document.body.requestFullscreen();
+            } else if (document.body.webkitRequestFullscreen) { /* Safari */
+                document.body.webkitRequestFullscreen();
+            } else if (document.body.msRequestFullscreen) { /* IE11 */
+                document.body.msRequestFullscreen();
+            }
+        } else {
+            // Close Fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+    }
+
     return (
         <>
-        <aside data-aside className={window.innerWidth < 544 ? 'sidebar-bottom' : ''} style={asideStyle}>
+        <aside className={isSmallerThan544 ? 'sidebar-bottom' : ''} style={asideStyle}>
             <div className="logo">
                 {collapsed ?
                     <PlayStationSmall style={{maxWidth: '100%', fill: colors.text, height: 60, marginBottom: 8, filter: `drop-shadow(2px 4px 5px ${colors.textWithOpacity(70)})`}} /> :
@@ -77,11 +115,27 @@ function SideBar() {
                 </li>)}
             </ul>
 
-            <span className='trigger' style={{color: colors.text}} onClick={() => setCollapsed(!collapsed)}>
-                {collapsed ? <DoubleRightOutlined /> : (<><DoubleLeftOutlined /><span style={{display: window.innerWidth < 544 ? 'none' : 'inline'}}>&nbsp;&nbsp;Shrink</span></>)}
+            <span className='trigger' style={{color: colors.text}}>
+                <div className="icons" onClick={() => setCollapsed(!collapsed)} style={{paddingLeft: collapsed ? 21 : fullScreen ? 9.5 : 25.5}}>
+                    {collapsed ? 
+                        <DoubleRightOutlined /> :
+                        <>
+                            <DoubleLeftOutlined />
+                            <span style={{display: isSmallerThan544 ? 'none' : 'block', whiteSpace: 'nowrap', overflow: 'hidden'}}>&nbsp;&nbsp;Shrink</span>
+                        </>
+                    }
+                </div>
+                <div className="icons" onClick={handleFullScreen} style={{paddingLeft: collapsed ? 21 : fullScreen ? 9.5 : 25.5}}>
+                    {
+                        !collapsed && fullScreen ? <><FullscreenExitOutlined /><span style={{display: isSmallerThan544 ? 'none' : 'block', whiteSpace: 'nowrap', overflow: 'hidden'}}>&nbsp;&nbsp;Exit Full Screen</span></> :
+                        !collapsed && !fullScreen ? <><FullscreenOutlined /><span style={{display: isSmallerThan544 ? 'none' : 'block', whiteSpace: 'nowrap', overflow: 'hidden'}}>&nbsp;&nbsp;Full Screen</span></> : 
+                        collapsed && fullScreen ? <FullscreenExitOutlined /> :
+                        <FullscreenOutlined />
+                    }
+                </div>
             </span>
         </aside>
-        {window.innerWidth < 544 && <DoubleRightOutlined style={{
+        {isSmallerThan544 && <DoubleRightOutlined style={{
             display: 'block',
             position: 'fixed',
             background: 'var(--mainBg)',
@@ -93,10 +147,10 @@ function SideBar() {
             border: '1px solid #FFF',
             translate: '0 -50%',
             left: 0,
-            top: '50%',
+            top: 'calc(50% + 90px)',
             borderRadius: '0 8px 8px 0',
             boxShadow: "0 0 5px #FFF",
-            cursor: 'pointer'
+            cursor: "pointer"
         }}
         onClick={() => setCollapsed(false)} />}
     </>

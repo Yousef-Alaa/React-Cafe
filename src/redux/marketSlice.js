@@ -1,18 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getUID } from '../App'
+// import { getUID } from '../App'
 
 let initialState =  [
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Nescafe`, icon: {local: true, src: 'nescafe.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Coffee`, icon: {local: true, src: 'coffee.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Indomi`, icon: {local: true, src: 'indomi.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Mango`, icon: {local: true, src: 'mango-juice.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `7UP`, icon: {local: true, src: '7up.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Pepsi`, icon: {local: true, src: 'pepsi.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Tea`, icon: {local: true, src: 'tea.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Water`, icon: {local: true, src: 'water.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Mirnda Apple`, icon: {local: true, src: 'apple.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Mirnda Orange`, icon: {local: true, src: 'mirnda-orange.png'} },
-    {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Orange`, icon: {local: true, src: 'orange-juice.png'} }
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Nescafe`, icon: {local: true, src: 'nescafe.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Coffee`, icon: {local: true, src: 'coffee.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Indomi`, icon: {local: true, src: 'indomi.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Mango`, icon: {local: true, src: 'mango-juice.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `7UP`, icon: {local: true, src: '7up.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Pepsi`, icon: {local: true, src: 'pepsi.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Tea`, icon: {local: true, src: 'tea.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Water`, icon: {local: true, src: 'water.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Mirnda Apple`, icon: {local: true, src: 'apple.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Mirnda Orange`, icon: {local: true, src: 'mirnda-orange.png'} },
+    // {uid: getUID(), price: Math.ceil( Math.random() * 10 ), stowage: Math.ceil( Math.random() * 15 ), name: `Orange`, icon: {local: true, src: 'orange-juice.png'} }
 ]
 
 export const marketSlice = createSlice({

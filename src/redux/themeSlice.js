@@ -1,20 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-let getColorsMap = (themeIsDark, bgIsLinear) => {
+let getColorsMap = () => {
     return {
+        white: '#FFF',
+        black: '#000',
         main: '#2980B9',
         rgbmain: '41, 128, 185',
-        mainBg: themeIsDark ? '#001529' : "#FFFFF7",
-        text: themeIsDark || bgIsLinear ? '#FFF' : '#000',
-        rgbtext: themeIsDark || bgIsLinear ? '255, 255, 255' : '0, 0, 0',
-        black: '#000',
-        white: '#FFF',
-        bgBlur: '10px',
+        text: '#FFF',
+        rgbtext: '255, 255, 255',
+        mainBg: "#001529",
+
         textWithOpacity: function(opacity) {
-            return themeIsDark || bgIsLinear ? `rgb(255 255 255 / ${opacity}%)` : `rgb(0 0 0 / ${opacity}%)`;
-        },
-        mainWithOpacity: function(opacity) {
-            return `rgb(41 128 185 / ${opacity}%)`;
+            let realOpacity = opacity / 100;
+            return `rgba(255, 255, 255, ${realOpacity})`;
         }
     }
 }
@@ -33,11 +31,9 @@ export const themeSlice = createSlice({
     reducers: {
         changeTheme: (state, action) => {
             state.isDark = action.payload
-            state.colors = getColorsMap(action.payload, state.bgLinear)
         },
         changeBgLinear: (state, action) => {
             state.bgLinear = action.payload
-            state.colors = getColorsMap(state.isDark, action.payload)
         },
         changeColors: (state, action) => {
             state.colors = action.payload

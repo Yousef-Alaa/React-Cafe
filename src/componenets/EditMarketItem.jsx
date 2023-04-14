@@ -1,4 +1,4 @@
-import { Modal, Row, Col, InputNumber, Input } from 'antd'
+import { Modal, Row, Col, InputNumber, Input, message } from 'antd'
 import { useEffect, useState } from 'react';
 import { editItem } from '../redux/marketSlice'
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,8 +23,19 @@ function EditMarketItem({isEditModalOpen, setIsEditModalOpen, itemId, setItemId}
             icon: myItem.icon
         }
 
-        dispatch(editItem(item))
-        setItemId('000000')
+        if (name !== '' && price !== null && stowage !== null) {
+            dispatch(editItem(item))
+            setItemId('000000')
+            message.success('Changed Successfuly')
+        } else {
+            if (name === '') {
+                message.error('Name Is Required')
+            } else if (stowage === null) {
+                message.error('Stowage Is Required')
+            } else if (price === null) {
+                message.error('Price Is Required')
+            }
+        }
     };
 
     useEffect(() => {
@@ -34,7 +45,7 @@ function EditMarketItem({isEditModalOpen, setIsEditModalOpen, itemId, setItemId}
     }, [myItem])
 
     return itemId === '000000' ? <div style={{display: 'none'}}>Select One</div> : (
-        <Modal title={`Editing item #${itemId}`} className='market-modal' open={isEditModalOpen} onOk={handleOk} onCancel={() => {setIsEditModalOpen(false); setItemId('000000')}}>
+        <Modal title={`Editing item #${itemId}`} className='custom-modal' open={isEditModalOpen} onOk={handleOk} onCancel={() => {setIsEditModalOpen(false); setItemId('000000')}}>
             <Row>
                 <Col span={24} style={{textAlign: 'right'}}>
                 <img src={myItem.icon.local ? `/images/marketicons/${myItem.icon.src}` : myItem.icon.src} width='40' height='40' alt='icon' />

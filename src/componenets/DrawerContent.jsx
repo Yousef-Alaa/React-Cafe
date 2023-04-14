@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Row, Button, Select, Layout, Modal } from 'antd';
+import { Col, Row, Button, Select, Layout, Modal, message } from 'antd';
 import { DollarCircleOutlined, FieldTimeOutlined, HourglassOutlined, ShoppingCartOutlined } from '@ant-design/icons'
 import { FaRegLightbulb } from 'react-icons/fa';
 import { MdMode } from 'react-icons/md';
@@ -9,6 +9,7 @@ import { ReactComponent as PS5} from '../assets/playstation-5.svg';
 import { useState } from 'react';
 import { setOrdersOnEndUint } from '../redux/marketSlice'
 import { useDispatch, useSelector } from 'react-redux';
+import { ReactComponent as NoData } from '../assets/no-market.svg'
 
 
 function DrawerContent({ unitState, unitDispatcher, unitType, unitName, setOpen }) {
@@ -134,9 +135,9 @@ function DrawerContent({ unitState, unitDispatcher, unitType, unitName, setOpen 
             </Row>
             <Row style={{marginTop: 20}}>
                 {
-                    unitState.status === 0 ? <Button onClick={() => unitDispatcher({type: 'UNIT_START'})} type="primary">Start</Button> :
-                    unitState.status === 1 ? <><Button onClick={() => unitDispatcher({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button onClick={() => setIsEndOpen(true)} style={{background: 'transparent'}} danger>End</Button></> :
-                    unitState.status === 2 ? <><Button onClick={() => unitDispatcher({type: 'UNIT_PAUSED'})} style={{marginRight: 15}}>Stop</Button><Button type="primary" onClick={() => setIsOpen(true)} style={{marginRight: 15}}>Order</Button><Button onClick={() => setIsEndOpen(true)} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
+                    unitState.status === 0 ? <Button  onClick={() => unitDispatcher({type: 'UNIT_START'})} type="primary">Start</Button> :
+                    unitState.status === 1 ? <><Button  onClick={() => unitDispatcher({type: 'UNIT_RESUME'})} style={{marginRight: 15}} type="primary">Resume</Button><Button  onClick={() => setIsEndOpen(true)} style={{background: 'transparent'}} danger>End</Button></> :
+                    unitState.status === 2 ? <><Button  onClick={() => unitDispatcher({type: 'UNIT_PAUSED'})} style={{marginRight: 15}}>Stop</Button><Button  type="primary" onClick={() => setIsOpen(true)} style={{marginRight: 15}}>Order</Button><Button  onClick={() => setIsEndOpen(true)} style={{background: 'transparent'}} danger>End</Button></> : "Unknown Status"
                 }
             </Row>
             <MarketItems unitState={unitState} unitDispatcher={unitDispatcher} ordersTotal={getOrdersTotal()} isOpen={isOpen} setIsOpen={setIsOpen} />
@@ -157,16 +158,16 @@ function MarketItems({ unitState, unitDispatcher, ordersTotal, isOpen, setIsOpen
 
     return (
         <Modal
-            title='Choose From Market Items'
-            className='market-modal custom-modal-footer'
+            title={unitState.orders.length > 0 ? 'Choose From Market Items' : 'No Market Items Founded !!'}
+            className='custom-modal custom-modal-footer'
             open={isOpen} onOk={() => setIsOpen(false)}
             onCancel={() => setIsOpen(false)}
             footer={[
-                <span key="total" style={{fontSize: 16, fontWeight: 'bold'}}>Orders Total: {ordersTotal}$</span>,
-                <Button key='ok' type='primary' onClick={() => setIsOpen(false)}>Ok</Button>
+                unitState.orders.length > 0 && <span key="total" style={{fontSize: 16, fontWeight: 'bold'}}>Orders Total: {ordersTotal}$</span>,
+                <Button key='ok'  type='primary' onClick={() => setIsOpen(false)}>Ok</Button>
             ]}
             >
-            <div className='menu-items'>
+            {unitState.orders.length > 0 && <div className='menu-items'>
                 {
                     unitState.orders.map((item, i) => <div key={i} onClick={() => handleClick(item.uid)}>
                         <img src={item.icon.local ? `/images/marketicons/${item.icon.src}` : item.icon.src} width={50} height={50} alt={`market item ${i + 1}`} />
@@ -174,7 +175,10 @@ function MarketItems({ unitState, unitDispatcher, ordersTotal, isOpen, setIsOpen
                         <span className='price'>{item.price}$</span>
                     </div>)
                 }
-            </div>
+            </div>}
+            {
+                unitState.orders.length === 0 && <div style={{height: '50vh', textAlign: 'center'}}><NoData style={{maxHeight: '100%'}} /></div>
+            }
         </Modal>
     )
 }
@@ -204,18 +208,47 @@ function UnitEnd({isEndOpen, unitState, setParentOpen, setIsEndOpen, unitDispatc
         unitDispatcher({type: 'UNIT_END'})
         dispatch(setOrdersOnEndUint(unitState.orders))
         setParentOpen(false)
-        //Todo add Report
+
+        let newDate = new Date();
+        let day = newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate();
+        let month = newDate.getMonth() + 1 < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1;
+        let date = `${day}-${month}-${newDate.getFullYear()}`
+        let hours = newDate.getHours() < 10 ? `0${newDate.getHours()}` : newDate.getHours();
+        let minutes = newDate.getMinutes() < 10 ? `0${newDate.getMinutes()}` : newDate.getMinutes();
+
+        let unitPayload = {
+            type: unitType,
+            date,
+            time: `${hours}:${minutes}`,
+            value: timeCost,
+            itemName: '#' + unitName.slice(-2)
+        }
+        dispatch({type: 'reports/addReport', payload: unitPayload})
+        if (ordersTotal > 0) {
+            let theRealOrders = unitState.orders
+                            .filter(item => item.count > 0)
+                            .map(item => ({
+                                type: 'market',
+                                date,
+                                time: `${hours}:${minutes}`,
+                                value: item.count * item.price,
+                                itemName: item.name
+                            }))
+            
+            dispatch({type: 'reports/addReport', payload: theRealOrders})
+        }
+        message.success('Closed Successful')
     }
 
     return (
         <Modal
             title='End Time'
-            className='market-modal endtime-modal'
+            className='custom-modal endtime-modal'
             open={isEndOpen} onOk={() => setIsEndOpen(false)}
             onCancel={() => setIsEndOpen(false)}
             footer={[
-                <Button key='ok' type='primary' onClick={handleClick}>End Now</Button>,
-                <Button key='back' onClick={() => setIsEndOpen(false)}>Cancel</Button>
+                <Button key='ok' type='primary'   onClick={handleClick}>End Now</Button>,
+                <Button key='back'   onClick={() => setIsEndOpen(false)}>Cancel</Button>
             ]}
             >
                 <div className='head'>

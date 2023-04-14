@@ -2,18 +2,18 @@ import { createSlice } from '@reduxjs/toolkit'
 
 let initialState = {
     pc: {
-        devices: 14,
+        devices: 0,
         hourPrice: 6,
     },
     ps4: {
-        devices: 10,
-        singlePrice: 12,
-        multiPrice: 18,
+        devices: 0,
+        singlePrice: 10,
+        multiPrice: 15,
     },
     ps5: {
-        devices: 5,
-        singlePrice: 20,
-        multiPrice: 30,
+        devices: 0,
+        singlePrice: 15,
+        multiPrice: 20,
     },
 };
 

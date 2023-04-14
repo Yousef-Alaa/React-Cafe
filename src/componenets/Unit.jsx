@@ -9,8 +9,6 @@ import DrawerContent from './DrawerContent.jsx';
 import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
-
-
 export default function Unit({index, unitType}) {
 
     const market = useSelector(state => state.market)
@@ -33,7 +31,7 @@ export default function Unit({index, unitType}) {
     const { unitIndexStyle } = UnitsDataConfig[unitType];
     const [unitState, unitDispatcher] = useReducer(unitReducer, initialValues)
     const unitImgStyle = {
-        fill: colors.textWithOpacity(isDark ? 75 : 90),
+        fill: colors.textWithOpacity(80),
         filter: 'drop-shadow(0 0 5px rgba(255, 255, 255, .8))',
         width: '100%',
         height: 115,
@@ -66,7 +64,7 @@ export default function Unit({index, unitType}) {
     <>
         <div className='item' style={{position: 'relative'}} onClick={() => setOpen(true)}>
             <div style={{ 
-                cursor: 'pointer',
+                cursor: "pointer",
                 zIndex: 2,
                 position: 'absolute',
                 inset: 0
@@ -87,7 +85,6 @@ export default function Unit({index, unitType}) {
                 }}>{getDuration()}</div>
         </div>
         <Drawer
-            className={isDark && 'dark-drawer'}
             title={`${unitType.toUpperCase()} Drawer ${index < 9 ? `0${index + 1}` : index + 1}`}
             placement='right'
             closable={true}

@@ -7,6 +7,7 @@ import NewMarketItem from '../../componenets/NewMarketItem';
 import EditMarketItem from '../../componenets/EditMarketItem';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteItem, deleteItems } from '../../redux/marketSlice'
+import { ReactComponent as NODATA } from '../../assets/no-market.svg'
 
 const columns = [
     { title: '#ID', dataIndex: 'uid'},
@@ -23,19 +24,15 @@ export default function Market() {
     const dispatch = useDispatch()
     const market = useSelector(state => state.market)
     
-    const [localMarket, setLocalMarket] = useState([{key: 1, icon: '', name: ``, price: 0, stowage: 0}])
+    const [localMarket, setLocalMarket] = useState([])
     const [itemId, setItemId] = useState('000000')
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isNewModalOpen, setIsNewModalOpen] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-    function onSelectChange(newSelectedRowKeys) {
-        setSelectedRowKeys(newSelectedRowKeys);
-    };
-
     const rowSelection = {
     selectedRowKeys,
-    onChange: onSelectChange,
+    onChange: newKeys => setSelectedRowKeys(newKeys),
     selections: [
         Table.SELECTION_ALL,
         Table.SELECTION_INVERT,
@@ -72,7 +69,7 @@ export default function Market() {
     };
 
     useEffect(() => {
-        let d = market.map((item, ind) => {
+        let data = market.map((item, ind) => {
             let i = ind + 1;
             return {
             ...item, 
@@ -84,7 +81,7 @@ export default function Market() {
                 justifyContent: 'center',
                 columnGap: '20px'
             }}>
-                <MdOutlineEdit onClick={() => {setIsEditModalOpen(true); setItemId(item.uid)}} style={{cursor: 'pointer', fontSize: 18}} />
+                <MdOutlineEdit onClick={() => {setIsEditModalOpen(true); setItemId(item.uid)}} style={{cursor: "pointer", fontSize: 18}} />
                 <Popconfirm
                 placement="topRight"
                 title='Confirm Deleting'
@@ -97,16 +94,20 @@ export default function Market() {
                 okText="Yes"
                 cancelText="No"
                 icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
-                    <DeleteOutlined style={{cursor: 'pointer', fontSize: 18, color: '#ff4d4f'}} />
+                    <DeleteOutlined style={{cursor: "pointer", fontSize: 18, color: '#ff4d4f'}} />
                 </Popconfirm>
             </div>
         }})
 
-        setLocalMarket(d)
+        setLocalMarket(data)
     }, [market])
 
     function handleDeleteItems() {
         let items = localMarket.filter(item => selectedRowKeys.includes(item.key)).map(item => item.uid)
+        if (items.length === 0) {
+            message.error('Please Select At Least One Item')
+            return;
+        }
         dispatch(deleteItems(items))
         setSelectedRowKeys([])
         setItemId('000000')
@@ -116,10 +117,14 @@ export default function Market() {
     return (
     <div className='market'>
         <PagesHead pageTitle='Market' />
-        <Table rowSelection={rowSelection} columns={columns} dataSource={localMarket} />
+        {
+            localMarket.length > 0 ?
+            <Table rowSelection={rowSelection} columns={columns} dataSource={localMarket} /> :
+            <div className='no-data no-data-market'><NODATA /></div>
+        }
         <div style={{display: 'flex', justifyContent: 'flex-end', marginTop: 20, paddingBottom: 40}}>
             <Button type='primary' onClick={() => setIsNewModalOpen(true)} style={{marginRight: 12}}>Add New Item</Button>
-            <Button type='primary' onClick={handleDeleteItems} danger>Remove Selected Items</Button>
+            {localMarket.length > 0 && <Button type='primary' onClick={handleDeleteItems} danger>Remove Selected Items</Button>}
         </div>
         
         <EditMarketItem isEditModalOpen={isEditModalOpen} setIsEditModalOpen={setIsEditModalOpen} itemId={itemId} setItemId={setItemId} />
