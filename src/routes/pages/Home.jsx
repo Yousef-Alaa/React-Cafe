@@ -17,7 +17,6 @@ function Home() {
         gridTemplateRows: `repeat(1, 1fr)`,
     }
 
-    // TODO NO DATA
     return (<>
         <PagesHead pageTitle='Home' />
         {

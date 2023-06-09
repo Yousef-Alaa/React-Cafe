@@ -23,10 +23,7 @@ export function getUID() {
     return uid
 
 }
-/* 
-    TODO:
-    Save All Settings and market and reports to Local Storage || DataBase
-*/
+
 function App() {
 
     const { isDark, bgLinear, colors } = useSelector(state => state.theme)

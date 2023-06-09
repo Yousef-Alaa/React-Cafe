@@ -7,7 +7,8 @@ import {
     ShopOutlined,
     FullscreenOutlined,
     FullscreenExitOutlined,
-    SettingOutlined
+    SettingOutlined,
+    InfoCircleOutlined
 } from '@ant-design/icons';
 import { useSelector } from 'react-redux';
 import { useMediaQuery } from 'react-responsive'
@@ -45,12 +46,13 @@ function SideBar() {
             key: '/settings',
             icon: <SettingOutlined />,
             label: "Settings"
+        },
+        {
+            key: '/about',
+            icon: <InfoCircleOutlined />,
+            label: "About"
         }
-        // {
-        //     key: '/getapp',
-        //     icon: <DownloadOutlined />,
-        //     label: "Get App"
-        // }
+
     ];
     const asideStyle = {
         backdropFilter: `blur(${isDark ? 0 : 3}px)`,
